@@ -3,15 +3,6 @@ module SimplePermissions
     @@current_user_method = :current_user
     @@permissions_method = :permissions
     @@permission_type = :role
-    @@user_model = :User
-    
-    def self.user_model
-      @@user_model
-    end
-    
-    def self.user_model=(value)
-      @@user_model = value
-    end
     
     def self.permission_type
       @@permission_type

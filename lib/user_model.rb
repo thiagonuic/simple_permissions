@@ -39,5 +39,3 @@ module SimplePermissions
     
   end
 end
-
-Kernel.const_get(SimplePermissions::Config.user_model).send :include, SimplePermissions::UserModelMethods

@@ -1,7 +1,13 @@
 module SimplePermissionsHelper
-  def has_permission(permissions={})
+  def has_permission(p_permissions)
     logged_user = self.send SimplePermissions::Config.current_user_method
 		has_access = false
+		
+		if (p_permissions.class == String)
+		  permissions = [p_permissions]
+	  else
+	    permissions = p_permissions
+    end
 		
 		if SimplePermissions::Config.permission_type == :read_write
       permissions.each do |permission, read_write|
