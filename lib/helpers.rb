@@ -1,4 +1,9 @@
 module SimplePermissionsHelper
+  
+  def has_permission!(permissions)
+    raise SimplePermissions::AccessDeniedException if !self.has_permission(permissions)
+  end
+  
   def has_permission(p_permissions)
     logged_user = self.send SimplePermissions::Config.current_user_method
 		has_access = false
@@ -25,6 +30,7 @@ module SimplePermissionsHelper
     
 		return has_access
   end
+  
 end
 
 ActionView::Base.send :include, SimplePermissionsHelper
