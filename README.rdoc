@@ -1,6 +1,114 @@
-= simple_permissions
+= Simple permissions
 
-Description goes here.
+Simple permissions aims to make available a simple way to check for roles in Rails. This gem has been tested on Rails 3 only. If you use `:lib => false` and include the modules correctly it should work fine on rails 2.3.
+
+== Configuration
+
+To configure you just need to change the config constants below:
+
+<dl>
+  <dt>SimplePermissions::Config.current_user_method = :current_user</dt>
+  <dd>This sets the method which will be used inside simple permissions to get the logged user and check for roles.</dd>
+  
+  <dt>SimplePermissions::Config.permissions_method = :permissions</dt>
+  <dd>This sets the name of the method from the user model which will be called to get the permissions.</dd>
+  
+  <dt>SimplePermissions::Config.permission_type = :role</dt>
+  <dd>This sets the type of permission which will be used to check the user roles. Allowed types are `:role` and `:read_write`. Both types will be described below.</dd>
+</dl>
+
+== Setup
+
+Include in your Gemfile:
+
+  gem 'simple_permissions'
+
+Run:
+
+  bundle install
+
+In the user model include methods for authorization like the code bellow:
+
+  class User < ActiveRecord::Base
+    include SimplePermissions::UserModelMethods
+  end
+
+== How it works
+
+=== Model methods
+
+The model methods included by the gem to check the user authorization expect the user model to respond to a `permissions` method that will return the user permissions according to the permission type defined.
+
+=== Permission types
+
+==== :role
+
+Using this permission type, the `permissions` method from the user model should return an array of strings containing the code of the permissions, like the example below:
+
+  ['CRUD_USER', 'CRUD_PROFILE']
+
+The suggested models for this approach are the following:
+
+<pre>
+
+ ______          _________         _____________          ____________________
+| User |________| Profile |_______| Permission  |________| PermissionCategory |
+|______| N    1 |_________| N   M |_____________| N    1 |____________________|
+                                  | code        |
+                                  | description |
+                                  |_____________|
+
+</pre>
+
+==== :read_write
+
+Using this permission type, the `permissions` method from the user model should return an hash having the permission code as key and the literal string `r` or `w` as value, like the example below:
+
+  {'CRUD_USER' => 'w', 'CRUD_PROFILE' => 'r'}
+
+The suggested models for this approach are the following:
+
+<pre>
+
+ ______          _________         ___________________          _____________          ____________________
+| User |________| Profile |_______| ProfilePermission |________| Permission  |________| PermissionCategory |
+|______| N    1 |_________| 1   N |___________________| N    1 |_____________| N    1 |____________________|
+                                  | read_write        |        | code        |
+                                  |___________________|        | description |
+                                                               |_____________|
+
+</pre>
+
+=== Controllers
+
+After installing the gem there will be two methods available for authorization: `has_permission` and `has_permission!`. Both receiving an array of permission codes or a hash depending on the permission type configured.
+
+At controllers it is recommended to put a `has_permission!` call as the first line of each action to validate the user credentials.
+
+  class SampleController < ApplicationController
+    def index
+      has_permission!('CRUD_COMPANY')
+      ...
+    end
+  end
+
+This credential check will raise an `SimplePermissions::AccessDeniedException` exception, so in order to capture nonauthorized actions it is recommended to include the following code in the application_controller.rb
+
+  class ApplicationController < ActionController::Base
+    rescue_from SimplePermissions::AccessDeniedException do |exception|
+      flash[:alert] = 'Access denied.'
+      redirect_to :root
+    end
+  end
+
+=== Helpers
+
+Both methods available for controllers are also available for the helpers, so you can use `has_permission` to show/hide stuff on views.
+
+== TODO
+
+* Generators for models, migrations for both permission types
+* Somehow authenticate routes
 
 == Contributing to simple_permissions
  
@@ -14,6 +122,6 @@ Description goes here.
 
 == Copyright
 
-Copyright (c) 2010 MotorSoft Tecnologia Ltda. See LICENSE.txt for
+Copyright (c) 2010 Thiago Nuic Vidigal. See LICENSE.txt for
 further details.
 
