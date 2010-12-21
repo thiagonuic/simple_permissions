@@ -51,12 +51,12 @@ The suggested models for this approach are the following:
 
 <pre>
 
- ______          _________         _____________          ____________________
-| User |________| Profile |_______| Permission  |________| PermissionCategory |
-|______| N    1 |_________| N   M |_____________| N    1 |____________________|
-                                  | code        |
-                                  | description |
-                                  |_____________|
+   ______          _________         _____________          ____________________
+  | User |________| Profile |_______| Permission  |________| PermissionCategory |
+  |______| N    1 |_________| N   M |_____________| N    1 |____________________|
+                                    | code        |
+                                    | description |
+                                    |_____________|
 
 </pre>
 
@@ -68,16 +68,12 @@ Using this permission type, the `permissions` method from the user model should 
 
 The suggested models for this approach are the following:
 
-<pre>
-
- ______          _________         ___________________          _____________          ____________________
-| User |________| Profile |_______| ProfilePermission |________| Permission  |________| PermissionCategory |
-|______| N    1 |_________| 1   N |___________________| N    1 |_____________| N    1 |____________________|
-                                  | read_write        |        | code        |
-                                  |___________________|        | description |
-                                                               |_____________|
-
-</pre>
+   ______          _________         ___________________          _____________          ____________________
+  | User |________| Profile |_______| ProfilePermission |________| Permission  |________| PermissionCategory |
+  |______| N    1 |_________| 1   N |___________________| N    1 |_____________| N    1 |____________________|
+                                    | read_write        |        | code        |
+                                    |___________________|        | description |
+                                                                 |_____________|
 
 === Controllers
 
